@@ -5,39 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Asif Saheer & Sadiya — Nikkah Invitation</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Amiri:ital,wght@0,400;0,700;1,400&family=Jost:wght@200;300;400&display=swap" rel="stylesheet">
-
-<!-- ✅ STEP 3: Firebase SDKs (no change needed here) -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyCoT0bfjgce4Cy50KylIm51SpBCWKFi_wQ",
-    authDomain: "sadiyasif-rsvp.firebaseapp.com",
-    databaseURL: "https://sadiyasif-rsvp-default-rtdb.firebaseio.com",
-    projectId: "sadiyasif-rsvp",
-    storageBucket: "sadiyasif-rsvp.firebasestorage.app",
-    messagingSenderId: "710047324784",
-    appId: "1:710047324784:web:0f67bea8e2f8f5bd15f2b5",
-    measurementId: "G-8R6D9QQQ7T"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const rsvpCol = collection(db, "rsvps");
-
-  // Expose to window so inline onclick handlers can use them
-  window._db = db;
-  window._rsvpCol = rsvpCol;
-  window._addDoc = addDoc;
-  window._getDocs = getDocs;
-  window._deleteDoc = deleteDoc;
-  window._doc = doc;
-  window._query = query;
-  window._orderBy = orderBy;
-  window._onSnapshot = onSnapshot;
-  window._firebaseReady = true;
-</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -64,6 +32,14 @@
     cursor: default;
   }
 
+  .heart-svg-fall {
+    position: absolute;
+    top: -60px;
+    animation: petalFall linear infinite;
+    opacity: 0;
+    pointer-events: none;
+  }
+
   .petal {
     position: absolute;
     top: -60px;
@@ -72,20 +48,11 @@
     opacity: 0;
   }
 
-  .heart-fall {
-    position: absolute;
-    top: -60px;
-    font-size: 16px;
-    animation: petalFall linear infinite;
-    opacity: 0;
-    line-height: 1;
-  }
-
   @keyframes petalFall {
     0%   { transform: translateY(0) rotate(0deg) translateX(0); opacity: 0; }
-    5%   { opacity: 0.75; }
-    90%  { opacity: 0.5; }
-    100% { transform: translateY(110vh) rotate(720deg) translateX(80px); opacity: 0; }
+    5%   { opacity: 0.65; }
+    90%  { opacity: 0.4; }
+    100% { transform: translateY(110vh) rotate(540deg) translateX(60px); opacity: 0; }
   }
 
   .star {
@@ -303,7 +270,6 @@
     padding: 1.5rem 2.5rem;
     opacity: 0;
     animation: fadeUp 0.8s ease 1.8s forwards;
-    margin-bottom: 0;
     box-sizing: border-box;
   }
 
@@ -351,6 +317,16 @@
     color: var(--ink-light);
     letter-spacing: 1px;
   }
+
+  #qrCodeContainer {
+    display: inline-block;
+    padding: 8px;
+    background: #fdf5ec;
+    border: 1px solid #e0cbb8;
+    margin-top: 0.8rem;
+  }
+  #qrCodeContainer canvas,
+  #qrCodeContainer img { display: block; }
 
   .countdown-section {
     margin-bottom: 2rem;
@@ -459,6 +435,7 @@
     position: relative;
   }
 
+  /* ── RSVP ── */
   .rsvp-section {
     padding: 2rem 0 0;
     opacity: 0;
@@ -472,6 +449,92 @@
     color: var(--muted);
     text-transform: uppercase;
     margin-bottom: 1.4rem;
+  }
+
+  /* Attendance toggle */
+  .attend-toggle {
+    display: flex;
+    border: 0.5px solid #d4b898;
+    overflow: hidden;
+    margin-bottom: 1.2rem;
+  }
+
+  .attend-btn {
+    flex: 1;
+    padding: 11px 8px;
+    font-family: 'Jost', sans-serif;
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: background 0.25s, color 0.25s;
+    position: relative;
+  }
+
+  .attend-btn + .attend-btn {
+    border-left: 0.5px solid #d4b898;
+  }
+
+  .attend-btn.active-yes {
+    background: linear-gradient(135deg, #5c2d20, #8a4030);
+    color: #f0ddb0;
+  }
+
+  .attend-btn.active-no {
+    background: #4a4a4a;
+    color: #e0d0c0;
+  }
+
+  /* Guest count slide */
+  .guest-count-wrap {
+    overflow: hidden;
+    max-height: 60px;
+    transition: max-height 0.4s cubic-bezier(0.22,1,0.36,1), opacity 0.3s ease;
+    opacity: 1;
+  }
+  .guest-count-wrap.collapsed {
+    max-height: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Sad note slide */
+  .sad-note-wrap {
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height 0.5s cubic-bezier(0.22,1,0.36,1), opacity 0.4s ease;
+    pointer-events: none;
+  }
+  .sad-note-wrap.visible {
+    max-height: 120px;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .sad-note-box {
+    border: 0.5px solid #c4a8b8;
+    background: linear-gradient(135deg, #fdf0f4, #f8eaf0);
+    padding: 1rem 1.2rem;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+
+  .sad-note-icon {
+    font-size: 20px;
+    display: block;
+    margin-bottom: 6px;
+    color: #b07a85;
+  }
+
+  .sad-note-text {
+    font-style: italic;
+    font-size: 14px;
+    color: var(--ink-light);
+    line-height: 1.7;
   }
 
   .form-field { margin-bottom: 10px; position: relative; }
@@ -520,6 +583,7 @@
   .rsvp-btn:hover { opacity: 0.88; }
   .rsvp-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
+  /* ── TOAST ── */
   .toast {
     position: fixed;
     bottom: 30px;
@@ -536,6 +600,8 @@
     z-index: 100;
     white-space: nowrap;
     box-shadow: 0 10px 40px rgba(92,45,32,0.35);
+    max-width: 90vw;
+    text-align: center;
   }
 
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -562,11 +628,10 @@
     line-height: 1.8;
   }
 
-  .heart-burst {
+  .heart-burst-svg {
     position: fixed;
     pointer-events: none;
     z-index: 999;
-    font-size: 18px;
     opacity: 0;
     animation: heartFloat 1s ease forwards;
   }
@@ -584,13 +649,17 @@
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: var(--cream); }
   ::-webkit-scrollbar-thumb { background: var(--rose-light); }
+
+  /* ── ADMIN ── */
+  #adminOverlay { display:none;position:fixed;inset:0;background:rgba(30,12,6,0.85);z-index:200;align-items:center;justify-content:center; }
+  #adminPanel   { display:none;position:fixed;inset:0;background:#fdf8f2;z-index:300;overflow-y:auto; }
 </style>
 </head>
 <body>
 
-<div class="petals-canvas" id="petalsCanvas"></div>
+<div class="petals-canvas" id="petalsCanvas" style="position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0;"></div>
 <div id="starsContainer"></div>
-<div class="toast" id="toast">✿ &nbsp; Jazakallah Khair — see you there!</div>
+<div class="toast" id="toast"></div>
 
 <div class="page">
   <div class="card" id="mainCard">
@@ -608,7 +677,7 @@
         <span class="amp">&amp;</span>
         <span class="name">Sadiya</span>
       </div>
-      <div class="divider" style="animation-delay:1.5s">
+      <div class="divider">
         <div class="div-line"></div>
         <div class="div-diamond"></div>
         <div class="div-diamond" style="margin:0 4px; opacity:0.5; width:5px;height:5px;"></div>
@@ -636,8 +705,13 @@
 
       <div class="venue-block">
         <div class="venue-label">&nbsp; Venue</div>
-        <div class="venue-name">Live Auditorium</div>
+        <div class="venue-name">Live Convention Centre</div>
         <div class="venue-addr">Kozhichena, Malappuram, Kerala</div>
+        <a href="https://maps.google.com/?q=Live+Convention+Centre+Kozhichena+Malappuram+Kerala" target="_blank" style="display:inline-block;margin-top:1rem;padding:9px 22px;border:0.5px solid #c9963a;color:#c9963a;font-family:'Jost',sans-serif;font-size:9px;letter-spacing:3px;text-transform:uppercase;text-decoration:none;white-space:nowrap;">✦ &nbsp; View on Maps &nbsp; ✦</a>
+        <div style="margin-top:1.4rem;">
+          <div style="font-family:'Jost',sans-serif;font-size:8px;letter-spacing:3px;color:#b09080;text-transform:uppercase;margin-bottom:0.8rem;">Scan to open location</div>
+          <div id="qrCodeContainer"></div>
+        </div>
       </div>
 
       <div class="countdown-section">
@@ -672,30 +746,56 @@
     <div class="body">
       <div class="rsvp-section">
         <div class="rsvp-title">✦ &nbsp; Kindly fill &nbsp; ✦</div>
-        <div class="form-field">
-          <input type="text" id="guestName" placeholder="Your full name" />
+
+        <!-- Attendance toggle — first -->
+        <div class="attend-toggle">
+          <button class="attend-btn" id="btnYes" onclick="setAttendance('yes')">✓ &nbsp; Will Attend</button>
+          <button class="attend-btn" id="btnNo"  onclick="setAttendance('no')">✕ &nbsp; Unable to Attend</button>
         </div>
-        <div class="form-field">
-          <select id="guestCount">
-            <option value="" disabled selected>Number of guests attending</option>
-            <option value="1">1 — Just myself</option>
-            <option value="2">2 guests</option>
-            <option value="3">3 guests</option>
-            <option value="4">4 guests</option>
-            <option value="5">5 guests</option>
-            <option value="6">6 guests</option>
-            <option value="7">7 guests</option>
-            <option value="8">8 guests</option>
-            <option value="9">9 guests</option>
-            <option value="10">10 guests</option>
-          </select>
+
+        <!-- Name — slides in for both options -->
+        <div class="guest-count-wrap" id="nameWrap">
+          <div class="form-field">
+            <input type="text" id="guestName" placeholder="Your full name" />
+          </div>
         </div>
-        <button class="rsvp-btn" id="rsvpBtn" onclick="submitRSVP()">Confirm Attendance</button>
+
+        <!-- Guest count — hidden when not attending -->
+        <div class="guest-count-wrap" id="guestCountWrap">
+          <div class="form-field">
+            <select id="guestCount">
+              <option value="" disabled selected>Number of guests attending</option>
+              <option value="1">1 — Just myself</option>
+              <option value="2">2 guests</option>
+              <option value="3">3 guests</option>
+              <option value="4">4 guests</option>
+              <option value="5">5 guests</option>
+              <option value="6">6 guests</option>
+              <option value="7">7 guests</option>
+              <option value="8">8 guests</option>
+              <option value="9">9 guests</option>
+              <option value="10">10 guests</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Sad note — shown when not attending -->
+        <div class="sad-note-wrap" id="sadNoteWrap">
+          <div class="sad-note-box">
+            <span class="sad-note-icon">🌙</span>
+            <div class="sad-note-text">
+              We will truly miss your presence.<br>
+              <em>May Allah bless you with happiness wherever you are.</em>
+            </div>
+          </div>
+        </div>
+
+        <button class="rsvp-btn" id="rsvpBtn" onclick="submitRSVP()">Confirm</button>
       </div>
     </div>
 
     <div class="footer">
-      <span class="footer-ornament">✦ &nbsp; ✧ &nbsp; ✦</span>
+      <span class="footer-ornament">✦ ✧ ✦</span>
       <div class="footer-msg">
         Your presence will fill our hearts with joy.<br>
         <em>May Allah bless this union.</em>
@@ -709,7 +809,7 @@
 </div>
 
 <!-- ADMIN LOGIN OVERLAY -->
-<div id="adminOverlay" style="display:none;position:fixed;inset:0;background:rgba(30,12,6,0.85);z-index:200;align-items:center;justify-content:center;">
+<div id="adminOverlay">
   <div id="adminBox" style="background:linear-gradient(160deg,#fffdf8,#fdf5ec);border:1px solid #ddc9b0;max-width:360px;width:90%;padding:2.5rem 2rem;text-align:center;position:relative;transform:scale(0.9);opacity:0;transition:all 0.35s cubic-bezier(0.22,1,0.36,1);">
     <div style="font-family:'Jost',sans-serif;font-size:9px;letter-spacing:4px;color:#b09080;text-transform:uppercase;margin-bottom:1.4rem;">✦ Host Access ✦</div>
     <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:22px;color:#3d2518;margin-bottom:1.5rem;">Enter Password</div>
@@ -720,9 +820,10 @@
   </div>
 </div>
 
-<!-- ADMIN PANEL OVERLAY -->
-<div id="adminPanel" style="display:none;position:fixed;inset:0;background:#fdf8f2;z-index:300;overflow-y:auto;">
-  <div style="max-width:680px;margin:0 auto;padding:2.5rem 1.5rem 5rem;">
+<!-- ADMIN PANEL -->
+<div id="adminPanel">
+  <div style="max-width:720px;margin:0 auto;padding:2.5rem 1.5rem 5rem;">
+
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;border-bottom:0.5px solid #e0cbb8;padding-bottom:1.2rem;">
       <div>
         <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:26px;color:#3d2518;">Host Dashboard</div>
@@ -731,110 +832,194 @@
       <button onclick="closeAdmin()" style="background:linear-gradient(135deg,#5c2d20,#8a4030);color:#f0ddb0;border:none;padding:8px 18px;font-family:'Jost',sans-serif;font-size:9px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;">Close</button>
     </div>
 
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:2rem;">
-      <div style="background:#fff;border:0.5px solid #e0cbb8;padding:1.2rem;text-align:center;">
-        <div style="font-family:'Cormorant Garamond',serif;font-size:38px;font-style:italic;color:#7a4a55;line-height:1;" id="stat-rsvps">0</div>
-        <div style="font-family:'Jost',sans-serif;font-size:8px;letter-spacing:2px;color:#b09080;text-transform:uppercase;margin-top:5px;">RSVPs</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:2rem;">
+      <div style="background:#fff;border:0.5px solid #e0cbb8;padding:1rem;text-align:center;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:34px;font-style:italic;color:#7a4a55;line-height:1;" id="stat-rsvps">0</div>
+        <div style="font-family:'Jost',sans-serif;font-size:7.5px;letter-spacing:2px;color:#b09080;text-transform:uppercase;margin-top:5px;">Responses</div>
       </div>
-      <div style="background:#fff;border:0.5px solid #e0cbb8;padding:1.2rem;text-align:center;">
-        <div style="font-family:'Cormorant Garamond',serif;font-size:38px;font-style:italic;color:#7a4a55;line-height:1;" id="stat-total">0</div>
-        <div style="font-family:'Jost',sans-serif;font-size:8px;letter-spacing:2px;color:#b09080;text-transform:uppercase;margin-top:5px;">Total Guests</div>
+      <div style="background:#fff;border:0.5px solid #e0cbb8;padding:1rem;text-align:center;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:34px;font-style:italic;color:#5a7a50;line-height:1;" id="stat-attending">0</div>
+        <div style="font-family:'Jost',sans-serif;font-size:7.5px;letter-spacing:2px;color:#b09080;text-transform:uppercase;margin-top:5px;">Attending</div>
       </div>
-      <div style="background:#fff;border:0.5px solid #e0cbb8;padding:1.2rem;text-align:center;">
-        <div style="font-family:'Cormorant Garamond',serif;font-size:38px;font-style:italic;color:#c9963a;line-height:1;" id="stat-avg">0</div>
-        <div style="font-family:'Jost',sans-serif;font-size:8px;letter-spacing:2px;color:#b09080;text-transform:uppercase;margin-top:5px;">Avg per RSVP</div>
+      <div style="background:#fff;border:0.5px solid #e0cbb8;padding:1rem;text-align:center;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:34px;font-style:italic;color:#b07a45;line-height:1;" id="stat-notcoming">0</div>
+        <div style="font-family:'Jost',sans-serif;font-size:7.5px;letter-spacing:2px;color:#b09080;text-transform:uppercase;margin-top:5px;">Not Coming</div>
       </div>
+      <div style="background:#fff;border:0.5px solid #e0cbb8;padding:1rem;text-align:center;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:34px;font-style:italic;color:#c9963a;line-height:1;" id="stat-total">0</div>
+        <div style="font-family:'Jost',sans-serif;font-size:7.5px;letter-spacing:2px;color:#b09080;text-transform:uppercase;margin-top:5px;">Total Guests</div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:0;margin-bottom:1.2rem;border:0.5px solid #d4b898;overflow:hidden;width:fit-content;">
+      <button onclick="setAdminFilter('all')" id="tab-all" style="padding:7px 18px;font-family:'Jost',sans-serif;font-size:8.5px;letter-spacing:2px;text-transform:uppercase;border:none;cursor:pointer;background:linear-gradient(135deg,#5c2d20,#8a4030);color:#f0ddb0;">All</button>
+      <button onclick="setAdminFilter('yes')" id="tab-yes" style="padding:7px 18px;font-family:'Jost',sans-serif;font-size:8.5px;letter-spacing:2px;text-transform:uppercase;border:none;border-left:0.5px solid #d4b898;cursor:pointer;background:#fff;color:#5a7a50;">✓ Attending</button>
+      <button onclick="setAdminFilter('no')"  id="tab-no"  style="padding:7px 18px;font-family:'Jost',sans-serif;font-size:8.5px;letter-spacing:2px;text-transform:uppercase;border:none;border-left:0.5px solid #d4b898;cursor:pointer;background:#fff;color:#b07a45;">✕ Not Coming</button>
     </div>
 
     <div style="display:flex;gap:10px;margin-bottom:1.5rem;flex-wrap:wrap;">
       <button onclick="exportCSV()" style="background:none;border:0.5px solid #c9963a;color:#c9963a;padding:8px 18px;font-family:'Jost',sans-serif;font-size:9px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;">⬇ Export CSV</button>
-      <button onclick="clearAll()" style="background:none;border:0.5px solid #d4a0a8;color:#b07a85;padding:8px 18px;font-family:'Jost',sans-serif;font-size:9px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;">✕ Clear All</button>
+      <button onclick="clearAll()"  style="background:none;border:0.5px solid #d4a0a8;color:#b07a85;padding:8px 18px;font-family:'Jost',sans-serif;font-size:9px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;">✕ Clear All</button>
     </div>
 
     <input type="text" id="adminSearch" placeholder="Search guest name…" oninput="renderAdmin()" style="width:100%;border:0.5px solid #d4b898;background:#fff;padding:10px 14px;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:15px;color:#3d2518;outline:none;margin-bottom:1rem;" />
 
     <div style="background:#fff;border:0.5px solid #e0cbb8;">
-      <div style="display:grid;grid-template-columns:2fr 1fr 1.4fr;padding:10px 16px;border-bottom:0.5px solid #e0cbb8;background:#fdf5ec;">
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1.2fr;padding:10px 16px;border-bottom:0.5px solid #e0cbb8;background:#fdf5ec;">
         <span style="font-family:'Jost',sans-serif;font-size:8px;letter-spacing:3px;color:#b09080;text-transform:uppercase;">Name</span>
+        <span style="font-family:'Jost',sans-serif;font-size:8px;letter-spacing:3px;color:#b09080;text-transform:uppercase;">Status</span>
         <span style="font-family:'Jost',sans-serif;font-size:8px;letter-spacing:3px;color:#b09080;text-transform:uppercase;">Guests</span>
         <span style="font-family:'Jost',sans-serif;font-size:8px;letter-spacing:3px;color:#b09080;text-transform:uppercase;">Time</span>
       </div>
       <div id="adminRows">
-        <div style="padding:2rem;text-align:center;font-style:italic;color:#c0a890;font-size:15px;">Loading…</div>
+        <div style="padding:2rem;text-align:center;font-style:italic;color:#c0a890;font-size:15px;">No responses yet</div>
       </div>
     </div>
+
   </div>
 </div>
 
 <script>
-  // ── PETALS + HEARTS
-  const canvas = document.getElementById('petalsCanvas');
-  const petalColors = ['#e8c4c8','#d4a0a8','#f0d8dc','#c9a0a8','#e0b8bc','#f5dde0'];
-  const heartSymbols = ['♥','♡','❤'];
+  // ── IN-MEMORY RSVP STORE ──
+  let rsvpStore = [];
 
-  for (let i = 0; i < 22; i++) {
-    const isHeart = i % 4 === 0;
-    const el = document.createElement('div');
-    el.className = isHeart ? 'heart-fall' : 'petal';
-    const size = 13 + Math.random() * 18;
-    const duration = 7 + Math.random() * 12;
-    const delay = Math.random() * 10;
-    const left = Math.random() * 100;
-    if (isHeart) {
-      el.textContent = heartSymbols[Math.floor(Math.random() * heartSymbols.length)];
-      el.style.cssText = `left:${left}%;color:${petalColors[Math.floor(Math.random()*petalColors.length)]};font-size:${size}px;animation-duration:${duration}s;animation-delay:${delay}s;`;
-    } else {
-      el.style.cssText = `width:${size}px;height:${size*1.4}px;background:${petalColors[Math.floor(Math.random()*petalColors.length)]};left:${left}%;animation-duration:${duration}s;animation-delay:${delay}s;`;
-    }
-    canvas.appendChild(el);
+  // SVG HEART helper
+  function createSVGHeart(size, color) {
+    const ns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(ns, 'svg');
+    svg.setAttribute('viewBox', '0 0 32 29');
+    svg.setAttribute('width', size);
+    svg.setAttribute('height', size * 0.9);
+    svg.style.overflow = 'visible';
+    const path = document.createElementNS(ns, 'path');
+    path.setAttribute('d', 'M16 27 C16 27 2 18 2 9.5 C2 5.36 5.36 2 9.5 2 C11.87 2 13.98 3.12 15.28 4.86 C15.64 5.33 16.36 5.33 16.72 4.86 C18.02 3.12 20.13 2 22.5 2 C26.64 2 30 5.36 30 9.5 C30 18 16 27 16 27 Z');
+    path.setAttribute('fill', color);
+    path.setAttribute('stroke', 'none');
+    svg.appendChild(path);
+    return svg;
   }
 
-  // ── STARS
+  // FLOATING HEARTS & PETALS
+  const canvas = document.getElementById('petalsCanvas');
+  const heartColors = ['#e8c4c8','#d4a0a8','#f0d8dc','#c9a0a8','#e0b8bc','#d4788a','#c96070'];
+  const petalColors = ['#e8c4c8','#d4a0a8','#f0d8dc','#c9a0a8','#e0b8bc'];
+  for (let i = 0; i < 35; i++) {
+    const isHeart = i % 3 !== 2;
+    const duration = 7 + Math.random() * 13;
+    const delay = Math.random() * 14;
+    const left = Math.random() * 100;
+    const color = heartColors[Math.floor(Math.random() * heartColors.length)];
+    if (isHeart) {
+      const size = 12 + Math.random() * 22;
+      const wrapper = document.createElement('div');
+      wrapper.className = 'heart-svg-fall';
+      wrapper.style.cssText = `left:${left}%;animation-duration:${duration}s;animation-delay:${delay}s;`;
+      const svgHeart = createSVGHeart(size, color);
+      svgHeart.style.opacity = '0.75';
+      wrapper.appendChild(svgHeart);
+      canvas.appendChild(wrapper);
+    } else {
+      const el = document.createElement('div');
+      el.className = 'petal';
+      const size = 10 + Math.random() * 16;
+      el.style.cssText = `width:${size}px;height:${size*1.4}px;background:${petalColors[Math.floor(Math.random()*petalColors.length)]};left:${left}%;animation-duration:${duration}s;animation-delay:${delay}s;`;
+      canvas.appendChild(el);
+    }
+  }
+
+  // STARS
   const sc = document.getElementById('starsContainer');
   for (let i = 0; i < 25; i++) {
     const s = document.createElement('div');
     s.className = 'star';
     const sz = 2 + Math.random()*3;
-    s.style.cssText = `width:${sz}px;height:${sz}px;top:${Math.random()*100}vh;left:${Math.random()*100}vw;animation-duration:${2+Math.random()*4}s;animation-delay:${Math.random()*5}s;`;
+    s.style.cssText = `width:${sz}px;height:${sz}px;top:${Math.random()*100}vh;left:${Math.random()*100}vw;animation-duration:${2+Math.random()*4}s;animation-delay:${Math.random()*5}s;position:fixed;border-radius:50%;background:#c9963a;opacity:0;animation-name:twinkle;pointer-events:none;z-index:0;`;
     sc.appendChild(s);
   }
 
-  // ── COUNTDOWN
+  // QR CODE
+  window.addEventListener('load', function() {
+    const qrContainer = document.getElementById('qrCodeContainer');
+    if (typeof QRCode !== 'undefined') {
+      new QRCode(qrContainer, {
+        text: 'https://maps.google.com/?q=Live+Convention+Centre+Kozhichena+Malappuram+Kerala',
+        width: 130, height: 130,
+        colorDark: '#5c2d20',
+        colorLight: '#fdf5ec',
+        correctLevel: QRCode.CorrectLevel.M
+      });
+    } else {
+      qrContainer.innerHTML = '<div style="width:130px;height:130px;display:flex;align-items:center;justify-content:center;font-family:\'Jost\',sans-serif;font-size:9px;color:#b09080;text-align:center;">Use map link above</div>';
+    }
+  });
+
+  // COUNTDOWN
   const weddingDate = new Date('2026-07-26T10:00:00');
   function updateCountdown() {
     const diff = weddingDate - new Date();
-    if (diff <= 0) { ['cd-days','cd-hours','cd-mins','cd-secs'].forEach(id => document.getElementById(id).textContent = '00'); return; }
+    if (diff <= 0) {
+      ['cd-days','cd-hours','cd-mins','cd-secs'].forEach(id => document.getElementById(id).textContent = '00');
+      return;
+    }
     function set(id, val) {
       const el = document.getElementById(id);
       const padded = String(val).padStart(2,'0');
-      if (el.textContent !== padded) { el.textContent = padded; el.classList.remove('flip'); void el.offsetWidth; el.classList.add('flip'); }
+      if (el.textContent !== padded) {
+        el.textContent = padded;
+        el.classList.remove('flip');
+        void el.offsetWidth;
+        el.classList.add('flip');
+      }
     }
-    set('cd-days', Math.floor(diff/86400000));
+    set('cd-days',  Math.floor(diff/86400000));
     set('cd-hours', Math.floor((diff%86400000)/3600000));
-    set('cd-mins', Math.floor((diff%3600000)/60000));
-    set('cd-secs', Math.floor((diff%60000)/1000));
+    set('cd-mins',  Math.floor((diff%3600000)/60000));
+    set('cd-secs',  Math.floor((diff%60000)/1000));
   }
   updateCountdown();
   setInterval(updateCountdown, 1000);
 
-  // ── ADMIN
-  const ADMIN_PASSWORD = 'diyasif2019';
-  let cachedGuests = [];
+  // ATTENDANCE TOGGLE STATE
+  let attendanceChoice = 'yes';
 
-  // Wait for Firebase to be ready
-  function waitForFirebase(cb, retries = 20) {
-    if (window._firebaseReady) { cb(); }
-    else if (retries > 0) { setTimeout(() => waitForFirebase(cb, retries - 1), 150); }
-    else { console.error('Firebase not loaded'); }
-  }
+  // Initial state: collapse name + guest count until user picks
+  document.getElementById('nameWrap').classList.add('collapsed');
+  document.getElementById('guestCountWrap').classList.add('collapsed');
+  // Reset buttons to neutral on load
+  document.getElementById('btnYes').className = 'attend-btn';
+  document.getElementById('btnNo').className  = 'attend-btn';
 
-  // ── SUBMIT RSVP → Firebase
-  async function submitRSVP() {
-    const name = document.getElementById('guestName').value.trim();
-    const count = document.getElementById('guestCount').value;
-    const btn = document.getElementById('rsvpBtn');
+  window.setAttendance = function(val) {
+    attendanceChoice = val;
+    document.getElementById('btnYes').className = 'attend-btn' + (val === 'yes' ? ' active-yes' : '');
+    document.getElementById('btnNo').className  = 'attend-btn' + (val === 'no'  ? ' active-no'  : '');
 
-    if (!name || !count) {
+    const nameWrap  = document.getElementById('nameWrap');
+    const countWrap = document.getElementById('guestCountWrap');
+    const sadWrap   = document.getElementById('sadNoteWrap');
+
+    // Name always visible once a choice is made
+    nameWrap.classList.remove('collapsed');
+
+    if (val === 'no') {
+      countWrap.classList.add('collapsed');
+      sadWrap.classList.add('visible');
+      document.getElementById('guestCount').value = '';
+    } else {
+      countWrap.classList.remove('collapsed');
+      sadWrap.classList.remove('visible');
+    }
+  };
+
+  // SUBMIT RSVP
+  window.submitRSVP = function() {
+    const name      = document.getElementById('guestName').value.trim();
+    const count     = document.getElementById('guestCount').value;
+    const btn       = document.getElementById('rsvpBtn');
+    const attending = (attendanceChoice === 'yes');
+
+    // Validate name
+    if (!name) {
       const nf = document.getElementById('guestName');
       nf.style.borderColor = '#b07a85';
       nf.style.boxShadow = '0 0 0 3px rgba(176,122,133,0.15)';
@@ -842,165 +1027,204 @@
       return;
     }
 
+    // Validate guest count only if attending
+    if (attending && !count) {
+      const cf = document.getElementById('guestCount');
+      cf.style.borderColor = '#b07a85';
+      setTimeout(() => { cf.style.borderColor = '#d4b898'; }, 1800);
+      return;
+    }
+
     btn.disabled = true;
     btn.textContent = 'Sending…';
 
-    try {
-      await waitForFirebaseAsync();
-      const now = new Date();
-      const timeStr = now.toLocaleDateString('en-GB', {day:'2-digit',month:'short'}) + ' ' +
-        now.toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit'});
+    // Save to in-memory store
+    const now = new Date();
+    const timeStr = now.toLocaleDateString('en-GB', {day:'2-digit', month:'short'}) + ' ' +
+      now.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
 
-      await window._addDoc(window._rsvpCol, {
-        name,
-        count: parseInt(count),
-        time: timeStr,
-        timestamp: now.toISOString()
-      });
-
-      document.getElementById('guestName').value = '';
-      document.getElementById('guestCount').value = '';
-      showToast();
-      spawnHearts(btn);
-    } catch(e) {
-      alert('Could not save RSVP. Please check your internet and try again.\n\nError: ' + e.message);
-    } finally {
-      btn.disabled = false;
-      btn.textContent = 'Confirm Attendance';
-    }
-  }
-
-  function waitForFirebaseAsync() {
-    return new Promise((resolve, reject) => {
-      let tries = 0;
-      const check = () => {
-        if (window._firebaseReady) resolve();
-        else if (tries++ < 20) setTimeout(check, 150);
-        else reject(new Error('Firebase not ready'));
-      };
-      check();
+    rsvpStore.unshift({
+      id: Date.now().toString(),
+      name,
+      attending,
+      count: attending ? parseInt(count) : 0,
+      time: timeStr,
+      timestamp: now.toISOString()
     });
+
+    // Reset form to initial state
+    document.getElementById('guestName').value = '';
+    document.getElementById('guestCount').value = '';
+    document.getElementById('sadNoteWrap').classList.remove('visible');
+    document.getElementById('nameWrap').classList.add('collapsed');
+    document.getElementById('guestCountWrap').classList.add('collapsed');
+    document.getElementById('btnYes').className = 'attend-btn';
+    document.getElementById('btnNo').className  = 'attend-btn';
+    attendanceChoice = 'yes';
+
+    if (attending) {
+      showToast('joy', '✦ &nbsp; Jazakallah Khair — we cannot wait to see you!');
+      spawnHearts(btn);
+    }
+
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.textContent = 'Confirm';
+    }, 600);
+  };
+
+  // TOAST
+  function showToast(mood, msg) {
+    const t = document.getElementById('toast');
+    t.innerHTML = msg;
+    t.style.background = mood === 'sad'
+      ? 'linear-gradient(135deg, #2e3a2e, #4a5a4a)'
+      : 'linear-gradient(135deg, #5c2d20, #8a4030)';
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 4500);
   }
 
-  // ── ADMIN LOGIN
-  function openAdminLogin() {
+  // ADMIN LOGIN
+  const ADMIN_PASSWORD = 'diyasif2019';
+
+  window.openAdminLogin = function() {
     const overlay = document.getElementById('adminOverlay');
     overlay.style.display = 'flex';
-    setTimeout(() => { const box = document.getElementById('adminBox'); box.style.transform = 'scale(1)'; box.style.opacity = '1'; }, 10);
-    setTimeout(() => document.getElementById('adminPwInput').focus(), 100);
-  }
+    setTimeout(() => {
+      const box = document.getElementById('adminBox');
+      box.style.transform = 'scale(1)';
+      box.style.opacity   = '1';
+    }, 10);
+    setTimeout(() => document.getElementById('adminPwInput').focus(), 120);
+  };
 
-  function closeAdminLogin() {
+  window.closeAdminLogin = function() {
     const box = document.getElementById('adminBox');
     box.style.transform = 'scale(0.9)';
-    box.style.opacity = '0';
+    box.style.opacity   = '0';
     setTimeout(() => { document.getElementById('adminOverlay').style.display = 'none'; }, 300);
-    document.getElementById('adminPwInput').value = '';
+    document.getElementById('adminPwInput').value   = '';
     document.getElementById('adminErr').textContent = '';
-  }
+  };
 
-  function checkAdmin() {
+  window.checkAdmin = function() {
     if (document.getElementById('adminPwInput').value === ADMIN_PASSWORD) {
-      closeAdminLogin();
-      setTimeout(openAdmin, 350);
+      window.closeAdminLogin();
+      setTimeout(window.openAdmin, 350);
     } else {
       document.getElementById('adminErr').textContent = 'Incorrect password';
       const inp = document.getElementById('adminPwInput');
       inp.style.borderColor = '#b07a85';
-      setTimeout(() => { inp.style.borderColor = '#d4b898'; document.getElementById('adminErr').textContent = ''; }, 1800);
+      setTimeout(() => {
+        inp.style.borderColor = '#d4b898';
+        document.getElementById('adminErr').textContent = '';
+      }, 1800);
     }
-  }
+  };
 
-  // ── ADMIN PANEL — load from Firebase
-  let unsubscribe = null;
+  // ADMIN PANEL
+  let adminFilter = 'all';
 
-  async function openAdmin() {
+  window.openAdmin = function() {
     document.getElementById('adminPanel').style.display = 'block';
-    document.getElementById('adminRows').innerHTML = '<div style="padding:2rem;text-align:center;font-style:italic;color:#c0a890;font-size:15px;">Loading…</div>';
+    renderAdmin();
+  };
 
-    await waitForFirebaseAsync();
-
-    // Real-time listener: updates dashboard instantly when anyone RSVPs
-    const q = window._query(window._rsvpCol, window._orderBy('timestamp', 'desc'));
-    unsubscribe = window._onSnapshot(q, (snapshot) => {
-      cachedGuests = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-      renderAdmin();
-    });
-  }
-
-  function closeAdmin() {
+  window.closeAdmin = function() {
     document.getElementById('adminPanel').style.display = 'none';
-    if (unsubscribe) { unsubscribe(); unsubscribe = null; }
-  }
+  };
+
+  window.setAdminFilter = function(f) {
+    adminFilter = f;
+    const defs = {
+      'all': { bg: '#fff', color: '#b09080' },
+      'yes': { bg: '#fff', color: '#5a7a50' },
+      'no':  { bg: '#fff', color: '#b07a45' }
+    };
+    Object.keys(defs).forEach(k => {
+      const el = document.getElementById('tab-' + k);
+      el.style.background = defs[k].bg;
+      el.style.color      = defs[k].color;
+    });
+    const active = document.getElementById('tab-' + f);
+    active.style.background = 'linear-gradient(135deg,#5c2d20,#8a4030)';
+    active.style.color      = '#f0ddb0';
+    renderAdmin();
+  };
 
   function renderAdmin() {
-    const q = (document.getElementById('adminSearch').value || '').toLowerCase();
-    const filtered = cachedGuests.filter(g => g.name.toLowerCase().includes(q));
+    const search    = (document.getElementById('adminSearch') ? document.getElementById('adminSearch').value : '').toLowerCase();
+    const attending = rsvpStore.filter(g => g.attending === true);
+    const notComing = rsvpStore.filter(g => g.attending === false);
+    const totalGuests = attending.reduce((s,g) => s + (g.count||0), 0);
+
+    document.getElementById('stat-rsvps').textContent     = rsvpStore.length;
+    document.getElementById('stat-attending').textContent = attending.length;
+    document.getElementById('stat-notcoming').textContent = notComing.length;
+    document.getElementById('stat-total').textContent     = totalGuests;
+
+    let filtered = rsvpStore;
+    if (adminFilter === 'yes') filtered = attending;
+    if (adminFilter === 'no')  filtered = notComing;
+    if (search) filtered = filtered.filter(g => g.name.toLowerCase().includes(search));
+
     const rows = document.getElementById('adminRows');
-
-    document.getElementById('stat-rsvps').textContent = cachedGuests.length;
-    const totalG = cachedGuests.reduce((s,g) => s + g.count, 0);
-    document.getElementById('stat-total').textContent = totalG;
-    document.getElementById('stat-avg').textContent = cachedGuests.length ? (totalG/cachedGuests.length).toFixed(1) : '0';
-
     if (filtered.length === 0) {
-      rows.innerHTML = `<div style="padding:2rem;text-align:center;font-style:italic;color:#c0a890;font-size:15px;">${cachedGuests.length === 0 ? 'No RSVPs yet' : 'No results found'}</div>`;
+      rows.innerHTML = `<div style="padding:2rem;text-align:center;font-style:italic;color:#c0a890;font-size:15px;">${rsvpStore.length === 0 ? 'No responses yet' : 'No results found'}</div>`;
       return;
     }
 
-    rows.innerHTML = filtered.map((g, i) => `
-      <div style="display:grid;grid-template-columns:2fr 1fr 1.4fr;padding:11px 16px;border-bottom:0.5px solid #f0e4d4;align-items:center;${i%2===0?'background:#fffaf6;':''}">
-        <span style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:16px;color:#3d2518;">${g.name}</span>
-        <span style="font-family:'Jost',sans-serif;font-size:11px;color:#7a4a55;background:#e8cfd4;padding:3px 10px;display:inline-block;">${g.count} guest${g.count>1?'s':''}</span>
-        <span style="font-family:'Jost',sans-serif;font-size:10px;color:#b09080;letter-spacing:0.5px;">${g.time || '—'}</span>
-      </div>
-    `).join('');
+    rows.innerHTML = filtered.map((g, i) => {
+      const isAtt = g.attending !== false;
+      const badge = isAtt
+        ? `<span style="font-family:'Jost',sans-serif;font-size:9px;color:#5a7a50;background:#e0f0d8;padding:3px 10px;display:inline-block;letter-spacing:1px;">✓ Attending</span>`
+        : `<span style="font-family:'Jost',sans-serif;font-size:9px;color:#b07a45;background:#f0e4d0;padding:3px 10px;display:inline-block;letter-spacing:1px;">✕ Not Coming</span>`;
+      const gText = isAtt
+        ? `<span style="font-family:'Jost',sans-serif;font-size:11px;color:#7a4a55;background:#e8cfd4;padding:3px 10px;display:inline-block;">${g.count||1} guest${(g.count||1)>1?'s':''}</span>`
+        : `<span style="color:#c0a890;font-family:'Jost',sans-serif;font-size:10px;">—</span>`;
+      return `
+        <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1.2fr;padding:11px 16px;border-bottom:0.5px solid #f0e4d4;align-items:center;${i%2===0?'background:#fffaf6;':''}">
+          <span style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:16px;color:#3d2518;">${g.name}</span>
+          ${badge}
+          ${gText}
+          <span style="font-family:'Jost',sans-serif;font-size:10px;color:#b09080;letter-spacing:0.5px;">${g.time||'—'}</span>
+        </div>`;
+    }).join('');
   }
 
-  function exportCSV() {
-    if (cachedGuests.length === 0) return;
-    const header = 'Name,Guests,Time\n';
-    const rows = cachedGuests.map(g => `"${g.name}",${g.count},"${g.time||''}"`).join('\n');
-    const blob = new Blob([header+rows], {type:'text/csv'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'wedding_rsvp_list.csv';
+  window.exportCSV = function() {
+    if (rsvpStore.length === 0) return;
+    const header = 'Name,Attending,Guests,Time\n';
+    const rows   = rsvpStore.map(g => `"${g.name}",${g.attending?'Yes':'No'},${g.attending?g.count:0},"${g.time||''}"`).join('\n');
+    const blob   = new Blob([header+rows], {type:'text/csv'});
+    const a      = document.createElement('a');
+    a.href       = URL.createObjectURL(blob);
+    a.download   = 'wedding_rsvp_list.csv';
     a.click();
-  }
+  };
 
-  async function clearAll() {
+  window.clearAll = function() {
     if (!confirm('Clear all RSVP data? This cannot be undone.')) return;
-    await waitForFirebaseAsync();
-    for (const g of cachedGuests) {
-      await window._deleteDoc(window._doc(window._db, 'rsvps', g.id));
-    }
-    cachedGuests = [];
+    rsvpStore = [];
     renderAdmin();
-  }
+  };
 
-  // ── TOAST
-  function showToast() {
-    const t = document.getElementById('toast');
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 3500);
-  }
-
-  // ── HEARTS
+  // HEART BURST on happy submit
   function spawnHearts(origin) {
     const rect = origin.getBoundingClientRect();
     const cx = rect.left + rect.width/2;
-    const cy = rect.top + rect.height/2;
-    const hearts = ['♥','♡','❀','✿'];
-    for (let i = 0; i < 8; i++) {
-      const h = document.createElement('div');
-      h.className = 'heart-burst';
-      h.textContent = hearts[Math.floor(Math.random()*hearts.length)];
-      h.style.left = (cx + (Math.random()-0.5)*80) + 'px';
-      h.style.top  = (cy + (Math.random()-0.5)*40) + 'px';
-      h.style.color = ['#b07a85','#c9963a','#d4a0a8'][Math.floor(Math.random()*3)];
-      h.style.animationDelay = (Math.random()*0.3) + 's';
-      document.body.appendChild(h);
-      setTimeout(() => h.remove(), 1800);
+    const cy = rect.top  + rect.height/2;
+    const colors = ['#b07a85','#c9963a','#d4a0a8','#e8c4c8','#7a4a55'];
+    for (let i = 0; i < 10; i++) {
+      const wrapper = document.createElement('div');
+      wrapper.className   = 'heart-burst-svg';
+      wrapper.style.left  = (cx + (Math.random()-0.5)*100) + 'px';
+      wrapper.style.top   = (cy + (Math.random()-0.5)*50)  + 'px';
+      wrapper.style.animationDelay = (Math.random()*0.4) + 's';
+      const svgH = createSVGHeart(14 + Math.random()*14, colors[Math.floor(Math.random()*colors.length)]);
+      wrapper.appendChild(svgH);
+      document.body.appendChild(wrapper);
+      setTimeout(() => wrapper.remove(), 1800);
     }
   }
 </script>
