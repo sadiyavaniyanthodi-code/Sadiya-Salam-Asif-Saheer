@@ -435,7 +435,65 @@
     position: relative;
   }
 
-  /* ── RSVP ── */
+  .family-invite-block {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin: 1.2rem 0 0.4rem;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 1.65s forwards;
+  }
+
+  .family-col {
+    flex: 1;
+    padding: 0.8rem 1rem;
+    background: linear-gradient(160deg, #fdf5ec, #f8ece0);
+    border: 0.5px solid #ddc9b0;
+  }
+
+  .family-label {
+    font-family: 'Jost', sans-serif;
+    font-size: 7.5px;
+    letter-spacing: 3px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .family-names {
+    font-size: 18px;
+    font-style: italic;
+    color: var(--ink);
+    line-height: 1.3;
+  }
+
+  .family-amp {
+    display: block;
+    font-size: 15px;
+    font-style: italic;
+    color: var(--rose);
+    margin: 1px 0;
+    line-height: 1.2;
+  }
+
+  .family-divider {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 0 6px;
+  }
+
+  .family-div-line {
+    width: 0.5px;
+    height: 22px;
+    background: linear-gradient(to bottom, transparent, var(--gold));
+  }
+
+  .family-div-line:last-child {
+    background: linear-gradient(to top, transparent, var(--gold));
+  }
   .rsvp-section {
     padding: 2rem 0 0;
     opacity: 0;
@@ -684,11 +742,26 @@
         <div class="div-diamond"></div>
         <div class="div-line r"></div>
       </div>
-      <div class="invite-prose">
-        Together with their beloved families,<br>
-        joyfully request the honour of your presence<br>
-        at the celebration of their
+      <div class="family-invite-block">
+        <div class="family-col">
+          <div class="family-label">Groom's Family</div>
+          <div class="family-names">Rafeeq<span class="family-amp">&amp;</span>Asiya</div>
+        </div>
+        <div class="family-divider">
+          <div class="family-div-line"></div>
+          <div class="div-diamond" style="width:5px;height:5px;"></div>
+          <div class="family-div-line"></div>
+        </div>
+        <div class="family-col">
+          <div class="family-label">Bride's Family</div>
+          <div class="family-names">Abdussalam<span class="family-amp">&amp;</span>Sajitha</div>
+        </div>
       </div>
+
+      <div class="invite-prose" style="margin-top:1.4rem;">
+        joyfully invite you to their celebration
+      </div>
+
       <div class="nikkah-pill">✦ &nbsp; Nikkah Ceremony &nbsp; ✦</div>
 
       <div class="details-row">
@@ -699,14 +772,14 @@
         <div class="detail-sep"></div>
         <div class="detail-col">
           <div class="detail-label">&nbsp; Time</div>
-          <div class="detail-val">10:00 AM</div>
+          <div class="detail-val" style="white-space:nowrap;">10:00 AM</div>
         </div>
       </div>
 
       <div class="venue-block">
         <div class="venue-label">&nbsp; Venue</div>
         <div class="venue-name">Live Convention Centre</div>
-        <div class="venue-addr">Kozhichena, Malappuram, Kerala</div>
+        <div class="venue-addr" style="font-family:'Cormorant Garamond',serif;font-style:italic;">Kozhichena, Malappuram, Kerala</div>
         <a href="https://maps.google.com/?q=Live+Convention+Centre+Kozhichena+Malappuram+Kerala" target="_blank" style="display:inline-block;margin-top:1rem;padding:9px 22px;border:0.5px solid #c9963a;color:#c9963a;font-family:'Jost',sans-serif;font-size:9px;letter-spacing:3px;text-transform:uppercase;text-decoration:none;white-space:nowrap;">✦ &nbsp; View on Maps &nbsp; ✦</a>
         <div style="margin-top:1.4rem;">
           <div style="font-family:'Jost',sans-serif;font-size:8px;letter-spacing:3px;color:#b09080;text-transform:uppercase;margin-bottom:0.8rem;">Scan to open location</div>
@@ -782,7 +855,6 @@
         <!-- Sad note — shown when not attending -->
         <div class="sad-note-wrap" id="sadNoteWrap">
           <div class="sad-note-box">
-            <span class="sad-note-icon">🌙</span>
             <div class="sad-note-text">
               We will truly miss your presence.<br>
               <em>May Allah bless you with happiness wherever you are.</em>
