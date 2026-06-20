@@ -271,11 +271,11 @@
   .nikkah-pill {
     display: inline-block;
     border: 1px solid var(--gold);
-    padding: 5px 24px;
+    padding: 5px 18px;
     font-family: 'Jost', sans-serif;
     font-weight: 700;
-    font-size: 9px;
-    letter-spacing: 4px;
+    font-size: clamp(7.5px, 2.6vw, 9px);
+    letter-spacing: clamp(1.5px, 0.8vw, 4px);
     color: #a4731f;
     text-transform: uppercase;
     margin-bottom: 2rem;
@@ -283,6 +283,8 @@
     animation: fadeUp 0.8s ease 1.7s forwards;
     position: relative;
     overflow: hidden;
+    white-space: nowrap;
+    max-width: 100%;
   }
 
   .nikkah-pill::before {
@@ -344,7 +346,7 @@
     margin-bottom: 6px;
   }
 
-  .venue-name { font-size: 22px; font-weight: 600; color: var(--ink); margin-bottom: 3px; }
+  .venue-name { font-size: clamp(17px, 5vw, 22px); font-weight: 600; color: var(--ink); margin-bottom: 3px; line-height: 1.25; }
 
   .venue-addr {
     font-family: 'Jost', sans-serif;
@@ -373,14 +375,12 @@
   .countdown-label {
     font-family: 'Jost', sans-serif;
     font-weight: 600;
-    font-size: 8px;
-    letter-spacing: 3px;
+    font-size: clamp(7px, 2.4vw, 8px);
+    letter-spacing: clamp(1px, 0.6vw, 3px);
     color: var(--rose-dark);
     text-transform: uppercase;
     margin-bottom: 1rem;
-    white-space: normal;
-    word-spacing: 2px;
-    padding: 0 0.5rem;
+    white-space: nowrap;
   }
 
   .countdown-grid {
@@ -777,6 +777,15 @@
   ::-webkit-scrollbar-track { background: var(--cream); }
   ::-webkit-scrollbar-thumb { background: var(--rose-light); }
 
+  @media (max-width: 420px) {
+    .body { padding: 2.5rem 1.4rem 2rem; }
+    .details-row { padding: 1.5rem 1.4rem; }
+    .venue-block { padding: 1.4rem 1.4rem; }
+    .quran-section { padding: 2rem 1.1rem; }
+    .name { font-size: 42px; }
+    .amp { font-size: 30px; }
+  }
+
   /* ── ADMIN ── */
   #adminOverlay { display:none;position:fixed;inset:0;background:rgba(30,12,6,0.85);z-index:200;align-items:center;justify-content:center; }
   #adminPanel   { display:none;position:fixed;inset:0;background:#fdf8f2;z-index:300;overflow-y:auto; }
@@ -831,7 +840,7 @@
         joyfully invite you to their celebration
       </div>
 
-      <div class="nikkah-pill">✦ &nbsp; Nikkah Ceremony &nbsp; ✦</div>
+      <div class="nikkah-pill">✦&nbsp; Nikkah Ceremony &nbsp;✦</div>
 
       <div class="details-row">
         <div class="detail-col">
@@ -849,7 +858,7 @@
         <div class="venue-label">&nbsp; Venue</div>
         <div class="venue-name">Live Convention Centre</div>
         <div class="venue-addr" style="font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:600;">Kozhichena, Malappuram, Kerala</div>
-        <a href="https://maps.google.com/?q=Live+Convention+Centre+Kozhichena+Malappuram+Kerala" target="_blank" style="display:inline-block;margin-top:1rem;padding:9px 22px;border:1px solid #c9963a;color:#a4731f;font-family:'Jost',sans-serif;font-size:9px;font-weight:800;letter-spacing:3px;text-transform:uppercase;text-decoration:none;white-space:nowrap;">✦ &nbsp; View on Maps &nbsp; ✦</a>
+        <a href="https://maps.google.com/?q=Live+Convention+Centre+Kozhichena+Malappuram+Kerala" target="_blank" style="display:inline-block;margin-top:1rem;padding:9px 22px;border:1px solid #c9963a;color:#a4731f;font-family:'Jost',sans-serif;font-size:9px;font-weight:800;letter-spacing:3px;text-transform:uppercase;text-decoration:none;white-space:nowrap;">✦&nbsp; View on Maps &nbsp;✦</a>
         <div style="margin-top:1.4rem;">
           <div style="font-family:'Jost',sans-serif;font-weight:600;font-size:8px;letter-spacing:3px;color:#8a6e5a;text-transform:uppercase;margin-bottom:0.8rem;">Scan to open location</div>
           <div id="qrCodeContainer"></div>
@@ -887,7 +896,7 @@
 
     <div class="body">
       <div class="rsvp-section">
-        <div class="rsvp-title">✦ &nbsp; Kindly fill &nbsp; ✦</div>
+        <div class="rsvp-title">✦&nbsp; Kindly fill &nbsp;✦</div>
 
         <!-- Attendance toggle — first -->
         <div class="attend-toggle">
